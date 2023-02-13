@@ -40,3 +40,14 @@ class Body(GameObject):
     def update(self):
         if not self.static:
             self.dynamic_collider.update()
+
+class Player (Body):
+
+    def __init__(self, pos, size, image):
+        super().__init__(pos, size, image)
+
+    def move(self, speed):
+        self.dynamic_collider.velocity = (speed, self.dynamic_collider.velocity[1])
+
+    def jump(self, speed):
+        self.dynamic_collider.velocity = (self.dynamic_collider.velocity[0], speed)

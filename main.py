@@ -38,6 +38,8 @@ if __name__ == "__main__":
     wall4.set_collider(Physics.BoxCollider(wall4))
     wall4.set_static(True)
     wall4.set_color((0, 0, 255))
+    player1 =  Game.Player((100, 630), (154, 303), pygame.image.load("resources/Bonhomme.png"))
+    player2 = Game.Player((700, 630), (154, 303), pygame.image.load("resources/Bonhomme2.png"))
     start_program = time.time()
     while running:
         start = pygame.time.get_ticks()
@@ -46,6 +48,10 @@ if __name__ == "__main__":
                 running = False
         window.draw_color((0, 0, 0))
         body.update()
+        player1.update()
+        window.draw_game_object(player1)
+        player2.update()
+        window.draw_game_object(player2)
         window.draw_game_object(body)
         window.draw_game_object(thing)
         window.draw_game_object(wall1)
