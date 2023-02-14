@@ -38,16 +38,23 @@ if __name__ == "__main__":
     wall4.set_collider(Physics.BoxCollider(wall4))
     wall4.set_static(True)
     wall4.set_color((0, 0, 255))
-    player1 =  Game.Player((100, 630), (154, 303), pygame.image.load("resources/Bonhomme.png"))
+    player1 = Game.Player((100, 630), (154, 303), pygame.image.load("resources/Bonhomme.png"))
     player2 = Game.Player((700, 630), (154, 303), pygame.image.load("resources/Bonhomme2.png"))
     start_program = time.time()
+    pressed = {}
     while running:
         start = pygame.time.get_ticks()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.KEYDOWN:
+                pressed[event.key] = True
+            elif event.type == pygame.KEYUP:
+                player1.dynamic_collider.velocity = (0, 0)
+                pressed[event.key] = False
         window.draw_color((0, 0, 0))
         body.update()
+        player1.move(200, pressed)
         player1.update()
         window.draw_game_object(player1)
         player2.update()
