@@ -164,7 +164,7 @@ class DynamicCollider:
     def get_collisions(self):
         colliders_to_check = colliders_in_game.copy()
         colliders_to_check.remove(self.collider)
-        return get_collider_colliding(self.collider, colliders_to_check);
+        return get_collider_colliding(self.collider, colliders_to_check)
 
     def get_penetration(self, colliders):
         penetrations = get_penetration_with_all(self.collider, colliders)
