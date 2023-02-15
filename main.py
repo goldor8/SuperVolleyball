@@ -14,14 +14,10 @@ if __name__ == "__main__":
     body.set_color((255, 0, 0))
     body.set_collider(Physics.CircleCollider(body))
     body.dynamic_collider.velocity = (1000, 0)
-    body.dynamic_collider.acceleration = (0, 0)
+    body.dynamic_collider.acceleration = (0, 300)
     body.dynamic_collider.air_friction = 0.0
     body.dynamic_collider.bounciness = 1
     body.dynamic_collider.ground_friction = 0
-    thing = Game.Body((300, 280), (100, 100), pygame.image.load("resources/circle.png"))
-    thing.set_collider(Physics.CircleCollider(thing))
-    thing.set_color((0, 255, 0))
-    thing.set_static(True)
     wall1 = Game.Body((400, 0), (800, 10))
     wall1.set_collider(Physics.BoxCollider(wall1))
     wall1.set_static(True)
@@ -39,6 +35,7 @@ if __name__ == "__main__":
     wall4.set_static(True)
     wall4.set_color((0, 0, 255))
     player1 = Game.Player((100, 630), (154, 303), pygame.image.load("resources/Bonhomme.png"))
+    player1.set_collider(Physics.BoxCollider(player1))
     player2 = Game.Player((700, 630), (154, 303), pygame.image.load("resources/Bonhomme2.png"))
     start_program = time.time()
     pressed = {}
@@ -54,13 +51,12 @@ if __name__ == "__main__":
                 pressed[event.key] = False
         window.draw_color((0, 0, 0))
         body.update()
-        player1.move(200, pressed)
+        player1.move(500, pressed)
         player1.update()
         window.draw_game_object(player1)
         player2.update()
         window.draw_game_object(player2)
         window.draw_game_object(body)
-        window.draw_game_object(thing)
         window.draw_game_object(wall1)
         window.draw_game_object(wall2)
         window.draw_game_object(wall3)
