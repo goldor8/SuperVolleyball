@@ -130,6 +130,7 @@ class DynamicCollider:
         self.ground_friction = 0
         self.bounciness = 0
         self.collider = None
+        self.collisions = []
 
     def set_colliders(self, collider):
         self.collider = collider
@@ -142,7 +143,8 @@ class DynamicCollider:
         self.game_object.pos = (self.game_object.pos[0] + self.velocity[0] * Game.timeStep, self.game_object.pos[1] + self.velocity[1] * Game.timeStep)
         self.velocity = (self.velocity[0] * (1 - self.air_friction * Game.timeStep), self.velocity[1] * (1 - self.air_friction * Game.timeStep))
         if self.collider is not None:
-            objects_colliding = self.get_collisions()
+            objects_colliding = self.get_instant_collisions()
+            self.set_collisions(objects_colliding)
             if len(objects_colliding) > 0:
                 penetration = self.get_penetration(objects_colliding)
                 penetration_normal = math.atan2(-penetration[1], -penetration[0])
@@ -161,10 +163,16 @@ class DynamicCollider:
                     self.velocity = (self.velocity[0] * (1 - self.ground_friction * Game.timeStep), -self.velocity[1] * self.bounciness)"""
                 self.game_object.pos = (self.game_object.pos[0] - penetration[0], self.game_object.pos[1] - penetration[1])
 
-    def get_collisions(self):
+    def _get_instant_collisions(self):
         colliders_to_check = colliders_in_game.copy()
         colliders_to_check.remove(self.collider)
         return get_collider_colliding(self.collider, colliders_to_check)
+
+    def get_collisions(self):
+        return self.collisions
+
+    def _set_collisions(self, collisions):
+        self.collisions = collisions;
 
     def get_penetration(self, colliders):
         penetrations = get_penetration_with_all(self.collider, colliders)
