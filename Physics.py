@@ -144,7 +144,7 @@ class DynamicCollider:
         self.velocity = (self.velocity[0] * (1 - self.air_friction * Game.timeStep), self.velocity[1] * (1 - self.air_friction * Game.timeStep))
         if self.collider is not None:
             objects_colliding = self._get_instant_collisions()
-            self.set_collisions(objects_colliding)
+            self._set_collisions(objects_colliding)
             if len(objects_colliding) > 0:
                 penetration = self.get_penetration(objects_colliding)
                 penetration_normal = math.atan2(-penetration[1], -penetration[0])
