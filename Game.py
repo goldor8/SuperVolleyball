@@ -59,4 +59,4 @@ class Player (Body):
                 self.dynamic_collider.velocity = (speed, self.dynamic_collider.velocity[1])
 
     def jump(self, speed):
-        self.dynamic_collider.velocity = (self.dynamic_collider.velocity[0], speed)
+        self.dynamic_collider.velocity = (self.dynamic_collider.velocity[0], -speed)
