@@ -222,14 +222,16 @@ def solve_constraints(dynamic_collider1: DynamicCollider, dynamic_collider2: Dyn
         projected_velocity2 = MathUtil.project_vector(velocity2, penetration)
         #print("projected : ", projected_velocity1, projected_velocity2)
 
+        average_bounciness = (dynamic_collider1.bounciness + dynamic_collider2.bounciness) / 2
+
         # https://www.vobarian.com/collisions/2dcollisions2.pdf
 
         final_velocity1x = (projected_velocity1[0] * (dynamic_collider1.mass - dynamic_collider2.mass) + projected_velocity2[0] * 2 * dynamic_collider2.mass) / (dynamic_collider1.mass + dynamic_collider2.mass)
         final_velocity1y = (projected_velocity1[1] * (dynamic_collider1.mass - dynamic_collider2.mass) + projected_velocity2[1] * 2 * dynamic_collider2.mass) / (dynamic_collider1.mass + dynamic_collider2.mass)
-        final_velocity1 = (final_velocity1x, final_velocity1y)
+        final_velocity1 = (final_velocity1x * average_bounciness, final_velocity1y * average_bounciness)
         final_velocity2x = (projected_velocity2[0] * (dynamic_collider2.mass - dynamic_collider1.mass) + projected_velocity1[0] * 2 * dynamic_collider1.mass) / (dynamic_collider1.mass + dynamic_collider2.mass)
         final_velocity2y = (projected_velocity2[1] * (dynamic_collider2.mass - dynamic_collider1.mass) + projected_velocity1[1] * 2 * dynamic_collider1.mass) / (dynamic_collider1.mass + dynamic_collider2.mass)
-        final_velocity2 = (final_velocity2x, final_velocity2y)
+        final_velocity2 = (final_velocity2x * average_bounciness, final_velocity2y * average_bounciness)
 
         #print("final : ", final_velocity1, final_velocity2)
         dynamic_collider1.velocity = dynamic_collider1.velocity[0] + final_velocity1[0] - projected_velocity1[0], dynamic_collider1.velocity[1] + final_velocity1[1] - projected_velocity1[1]

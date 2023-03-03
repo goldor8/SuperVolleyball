@@ -67,6 +67,7 @@ if __name__ == "__main__":
         player1.move(500, pressed)
         player1.update()
         window.draw_game_object(player1)
+        player2.move(500, pressed, 0)
         player2.update()
         window.draw_game_object(player2)
         window.draw_game_object(body)
