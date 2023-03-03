@@ -14,9 +14,9 @@ if __name__ == "__main__":
     body.set_color((255, 0, 0))
     body.set_collider(Physics.CircleCollider(body))
     body.dynamic_collider.velocity = (1000, 0)
-    body.dynamic_collider.acceleration = (0, 150)
+    body.dynamic_collider.acceleration = (0, 1500)
     body.dynamic_collider.air_friction = 0.0
-    body.dynamic_collider.bounciness = 1.0
+    body.dynamic_collider.bounciness = 1
     body.dynamic_collider.ground_friction = 0
     wall1 = Game.Body((400, 0), (800, 10))
     wall1.set_collider(Physics.BoxCollider(wall1))
@@ -26,10 +26,10 @@ if __name__ == "__main__":
     wall2.set_collider(Physics.BoxCollider(wall2))
     wall2.set_static(True)
     wall2.set_color((0, 0, 255))
-    wall3 = Game.Body((400, 800), (800, 10))
-    wall3.set_collider(Physics.BoxCollider(wall3))
-    wall3.set_static(True)
-    wall3.set_color((0, 0, 255))
+    ground = Game.Body((400, 800), (800, 10))
+    ground.set_collider(Physics.BoxCollider(ground))
+    ground.set_static(True)
+    ground.set_color((0, 0, 255))
     wall4 = Game.Body((800, 400), (10, 800))
     wall4.set_collider(Physics.BoxCollider(wall4))
     wall4.set_static(True)
@@ -49,7 +49,7 @@ if __name__ == "__main__":
                 running = False
             elif event.type == pygame.KEYDOWN:
                 pressed[event.key] = True
-                if event.key == pygame.K_SPACE and wall3.get_collider() in player1.dynamic_collider.get_collisions():
+                if event.key == pygame.K_SPACE and ground.get_collider() in player1.dynamic_collider.get_collisions():
                     player1.jump(1600)
             elif event.type == pygame.KEYUP:
                 player1.dynamic_collider.velocity = (0, player1.dynamic_collider.velocity[1])
@@ -65,7 +65,7 @@ if __name__ == "__main__":
         window.draw_game_object(body)
         window.draw_game_object(wall1)
         window.draw_game_object(wall2)
-        window.draw_game_object(wall3)
+        window.draw_game_object(ground)
         window.draw_game_object(wall4)
         #window.draw_text(str(Physics.get_circle_collider_penetration(body.get_collider(), thing.get_collider())), (0, 0), (255, 255, 255), 20)
         window.update()
