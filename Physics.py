@@ -228,10 +228,10 @@ def solve_constraints(dynamic_collider1: DynamicCollider, dynamic_collider2: Dyn
 
         final_velocity1x = (projected_velocity1[0] * (dynamic_collider1.mass - dynamic_collider2.mass) + projected_velocity2[0] * 2 * dynamic_collider2.mass) / (dynamic_collider1.mass + dynamic_collider2.mass)
         final_velocity1y = (projected_velocity1[1] * (dynamic_collider1.mass - dynamic_collider2.mass) + projected_velocity2[1] * 2 * dynamic_collider2.mass) / (dynamic_collider1.mass + dynamic_collider2.mass)
-        final_velocity1 = (final_velocity1x * average_bounciness, final_velocity1y * average_bounciness)
+        final_velocity1 = (final_velocity1x * dynamic_collider1.bounciness, final_velocity1y * dynamic_collider1.bounciness)
         final_velocity2x = (projected_velocity2[0] * (dynamic_collider2.mass - dynamic_collider1.mass) + projected_velocity1[0] * 2 * dynamic_collider1.mass) / (dynamic_collider1.mass + dynamic_collider2.mass)
         final_velocity2y = (projected_velocity2[1] * (dynamic_collider2.mass - dynamic_collider1.mass) + projected_velocity1[1] * 2 * dynamic_collider1.mass) / (dynamic_collider1.mass + dynamic_collider2.mass)
-        final_velocity2 = (final_velocity2x * average_bounciness, final_velocity2y * average_bounciness)
+        final_velocity2 = (final_velocity2x * dynamic_collider2.bounciness, final_velocity2y * dynamic_collider2.bounciness)
 
         #print("final : ", final_velocity1, final_velocity2)
         dynamic_collider1.velocity = dynamic_collider1.velocity[0] + final_velocity1[0] - projected_velocity1[0], dynamic_collider1.velocity[1] + final_velocity1[1] - projected_velocity1[1]
@@ -255,3 +255,8 @@ def solve_constraints(dynamic_collider1: DynamicCollider, dynamic_collider2: Dyn
 
         dynamic_collider1.velocity = (bounce_velocity[0] * dynamic_collider1.bounciness, bounce_velocity[1] * dynamic_collider1.bounciness)
         dynamic_collider1.game_object.pos = (dynamic_collider1.game_object.pos[0] - penetration[0], dynamic_collider1.game_object.pos[1] - penetration[1])
+
+
+def reset():
+    global colliders_in_game
+    colliders_in_game = []
