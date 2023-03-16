@@ -135,6 +135,8 @@ def get_penetration_coefficient(total_penetration, object_penetration):
 class DynamicCollider:
     def __init__(self, game_object):
         self.game_object = game_object
+        self.initial_velocity = (0, 0)
+        self.initial_acceleration = (0, 0)
         self.velocity = (0, 0)
         self.acceleration = (0, 0)
         self.air_friction = 0

@@ -6,49 +6,15 @@ import time
 import Physics
 
 running = True
+is_on_game = False
 frame = 0
 
 if __name__ == "__main__":
     window = Graphic.Window("Test", 800, 800)
-    body = Game.Body((100, 210), (100, 100), pygame.image.load("resources/circle.png"))
-    body.set_color((255, 0, 0))
-    body.set_collider(Physics.CircleCollider(body))
-    body.dynamic_collider.velocity = (800, 0)
-    body.dynamic_collider.acceleration = (0, 1000)
-    body.dynamic_collider.bounciness = 1
-    body.dynamic_collider.mass = 1
-    wall1 = Game.Body((400, 0), (800, 10))
-    wall1.set_collider(Physics.BoxCollider(wall1))
-    wall1.set_static(True)
-    wall1.set_color((0, 0, 255))
-    wall2 = Game.Body((0, 400), (10, 800))
-    wall2.set_collider(Physics.BoxCollider(wall2))
-    wall2.set_static(True)
-    wall2.set_color((0, 0, 255))
-    ground = Game.Body((400, 800), (800, 10))
-    ground.set_collider(Physics.BoxCollider(ground))
-    ground.set_static(True)
-    ground.set_color((0, 0, 255))
-    wall4 = Game.Body((800, 400), (10, 800))
-    wall4.set_collider(Physics.BoxCollider(wall4))
-    wall4.set_static(True)
-    wall4.set_color((0, 0, 255))
-    net = Game.Body((400, 790), (10, 400))
-    net.set_collider(Physics.BoxCollider(net))
-    net.set_static(True)
-    net.set_color((0, 0, 255))
-    player1 = Game.Player((100, 630), (64, 64), pygame.image.load("resources/Bonhomme.png"))
-    player1.set_collider(Physics.CircleCollider(player1))
-    player1.dynamic_collider.acceleration = (0, 4000)
-    player1.dynamic_collider.air_friction = 0.5
-    player1.dynamic_collider.mass = 40
-    player2 = Game.Player((700, 630), (154, 303), pygame.image.load("resources/Bonhomme2.png"))
-    player2.set_collider(Physics.BoxCollider(player2))
-    player2.dynamic_collider.acceleration = (0, 4000)
-    player2.dynamic_collider.air_friction = 0.5
-    player2.dynamic_collider.mass = 80
     start_program = time.time()
     pressed = {}
+    play_button = pygame.image.load("resources/jouer.png")
+    Game.set_objects()
     while running:
         start = pygame.time.get_ticks()
         for event in pygame.event.get():
@@ -56,35 +22,28 @@ if __name__ == "__main__":
                 running = False
             elif event.type == pygame.KEYDOWN:
                 pressed[event.key] = True
-                if event.key == pygame.K_SPACE and ground.get_collider() in player1.dynamic_collider.get_collisions():
-                    player1.jump(1600)
-                elif event.key == pygame.K_UP and ground.get_collider() in player2.dynamic_collider.get_collisions():
-                    player2.jump(1600)
+                if is_on_game:
+                    Game.event_keydown(event.key)
             elif event.type == pygame.KEYUP:
-                player1.dynamic_collider.velocity = (0, player1.dynamic_collider.velocity[1])
                 pressed[event.key] = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                coord = pygame.mouse.get_pos()
+                if 200 < coord[0] < 450 and 300 < coord[1] < 416 and not is_on_game:
+                    is_on_game = True
+                    Game.reset()
+        # window.draw_text(str(Physics.get_circle_collider_penetration(body.get_collider(), thing.get_collider())), (0, 0), (255, 255, 255), 20)
         window.draw_color((0, 0, 0))
-        body.update()
-        player1.move(500, pressed)
-        player1.update()
-        window.draw_game_object(player1)
-        player2.move(500, pressed, 0)
-        player2.update()
-        window.draw_game_object(player2)
-        window.draw_game_object(body)
-        window.draw_game_object(wall1)
-        window.draw_game_object(wall2)
-        window.draw_game_object(ground)
-        window.draw_game_object(wall4)
-        window.draw_game_object(net)
-        #window.draw_text(str(Physics.get_circle_collider_penetration(body.get_collider(), thing.get_collider())), (0, 0), (255, 255, 255), 20)
+        if is_on_game:
+            Game.update_game(window, pressed)
+            if Game.detect_end():
+                is_on_game = False
+        else:
+            window.screen.blit(play_button, (200, 300))
         window.update()
-        frame_time = pygame.time.get_ticks() - start # in milliseconds
+        frame_time = pygame.time.get_ticks() - start  # in milliseconds
         frame += 1
         if frame_time < int(Game.timeStep * 1000):
             pygame.time.delay(int(Game.timeStep * 1000) - frame_time)
-        if ground.get_collider() in body.dynamic_collider.get_collisions() and body.pos[0] < 400:
-            quit()
 
     print("Program time: " + str(time.time() - start_program))
     print("Frame count: " + str(frame))
