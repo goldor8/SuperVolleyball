@@ -5,7 +5,7 @@ import pygame
 import Graphic
 import Physics
 
-timeStep = 1 / 60
+timeStep = 1 / 1000
 all_objects = []
 
 
