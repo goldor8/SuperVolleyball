@@ -14,7 +14,7 @@ if __name__ == "__main__":
     start_program = time.time()
     pressed = {}
     play_button = pygame.image.load("resources/jouer.png")
-    Game.set_objects()
+    Game.init_objects()
     while running:
         start = pygame.time.get_ticks()
         for event in pygame.event.get():
@@ -34,7 +34,7 @@ if __name__ == "__main__":
         # window.draw_text(str(Physics.get_circle_collider_penetration(body.get_collider(), thing.get_collider())), (0, 0), (255, 255, 255), 20)
         window.draw_color((0, 0, 0))
         if is_on_game:
-            Game.update_game(window, pressed)
+            Game.update(pressed)
             if Game.detect_end():
                 is_on_game = False
         else:

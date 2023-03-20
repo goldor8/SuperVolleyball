@@ -135,6 +135,7 @@ def get_penetration_coefficient(total_penetration, object_penetration):
 class DynamicCollider:
     def __init__(self, game_object):
         self.game_object = game_object
+        self.static = False
         self.initial_velocity = (0, 0)
         self.initial_acceleration = (0, 0)
         self.velocity = (0, 0)
@@ -153,6 +154,8 @@ class DynamicCollider:
         return self.collider
 
     def update(self):
+        if self.static:
+            return
         self.velocity = (self.velocity[0] + self.acceleration[0] * Game.timeStep,
                          self.velocity[1] + self.acceleration[1] * Game.timeStep)
         self.game_object.pos = (self.game_object.pos[0] + self.velocity[0] * Game.timeStep,
@@ -210,13 +213,13 @@ class DynamicCollider:
 
 
 def solve_constraints(dynamic_collider1: DynamicCollider, dynamic_collider2: DynamicCollider): # with energy conservation
-    if dynamic_collider1.game_object.static:
+    if dynamic_collider1.static:
         print("should not call this function with static collider as first argument")
         return
     penetration = get_penetration(dynamic_collider1.collider, dynamic_collider2.collider)
     collision_normal_angle = math.atan2(-penetration[1], -penetration[0])
 
-    if not dynamic_collider2.game_object.static:
+    if not dynamic_collider2.static:
         velocity1 = dynamic_collider1.velocity
         velocity2 = dynamic_collider2.velocity
         projected_velocity1 = MathUtil.project_vector(velocity1, penetration)

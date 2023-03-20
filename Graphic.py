@@ -3,17 +3,17 @@ import Game as GameObject
 
 
 class Window:
+    main_window = None
     pygame.init()
-    __main_screen = None
 
     def __init__(self, title, width, height):
-        if Window.__main_screen is not None:
+        if Window.main_window is not None:
             raise Exception("Window already exists")
         self.title = title
         self.width = width
         self.height = height
         self.screen = pygame.display.set_mode((self.width, self.height))
-        __main_window = self.screen
+        Window.main_window = self
 
         pygame.display.set_caption(self.title)
 
