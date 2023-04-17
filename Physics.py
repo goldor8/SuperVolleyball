@@ -184,24 +184,25 @@ class DynamicCollider:
                 self._on_collision(objects_collidings)
 
 
-    def _on_collision(self, objects_colliding):
-        penetration_sum = self.get_penetration(objects_colliding)
-        penetration_normal = math.atan2(-penetration_sum[1], -penetration_sum[0])
-
-        velocity_angle = math.atan2(self.velocity[1], self.velocity[0])
-        velocity_magnitude = MathUtil.magnitude(self.velocity)
-        angle_difference = velocity_angle - penetration_normal
-
-        bounce_angle = math.atan2(math.sin(angle_difference), -math.cos(angle_difference)) + penetration_normal
-        bounce_velocity = (velocity_magnitude * math.cos(bounce_angle), velocity_magnitude * math.sin(bounce_angle))
+    def _on_collision(self, objects_colliding, should_resolve=True):
+        # penetration_sum = self.get_penetration(objects_colliding)
+        # penetration_normal = math.atan2(-penetration_sum[1], -penetration_sum[0])
+        #
+        # velocity_angle = math.atan2(self.velocity[1], self.velocity[0])
+        # velocity_magnitude = MathUtil.magnitude(self.velocity)
+        # angle_difference = velocity_angle - penetration_normal
+        #
+        # bounce_angle = math.atan2(math.sin(angle_difference), -math.cos(angle_difference)) + penetration_normal
+        # bounce_velocity = (velocity_magnitude * math.cos(bounce_angle), velocity_magnitude * math.sin(bounce_angle))
 
         #self.velocity = (bounce_velocity[0] * self.bounciness, bounce_velocity[1] * self.bounciness)
         #self.game_object.pos = (self.game_object.pos[0] - penetration_sum[0], self.game_object.pos[1] - penetration_sum[1])  # correct object intersection
         for function in self.on_collision:
             function(self.game_object, objects_colliding)
-        for collider in objects_colliding:
-            if isinstance(collider.game_object, Game.Body):
-                self._resolve_collision(collider.game_object.dynamic_collider)
+        if should_resolve:
+            for collider in objects_colliding:
+                if isinstance(collider.game_object, Game.Body):
+                    self._resolve_collision(collider.game_object.dynamic_collider)
 
     def _get_kinetic_energy(self, velocity_vect):
         return (self.mass * velocity_vect ** 2) / 2
@@ -226,6 +227,7 @@ class DynamicCollider:
 
     def _resolve_collision(self, collider):
         solve_constraints(self, collider)
+        collider._on_collision([self], False)
 
 
 
