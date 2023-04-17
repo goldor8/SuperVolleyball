@@ -6,16 +6,18 @@ class Window:
     main_window = None
     pygame.init()
 
-    def __init__(self, title, width, height):
+    def __init__(self, title):
         if Window.main_window is not None:
             raise Exception("Window already exists")
         self.title = title
-        self.width = width
-        self.height = height
-        self.screen = pygame.display.set_mode((self.width, self.height))
+        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        self.size = (self.screen.get_width(), self.screen.get_height())
         Window.main_window = self
 
         pygame.display.set_caption(self.title)
+
+    def get_size(self):
+        return self.size
 
     def draw_color(self, color):
         self.screen.fill(color)

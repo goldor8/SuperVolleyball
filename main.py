@@ -3,18 +3,16 @@ import Game
 import Graphic
 import time
 
-import Physics
-
 running = True
 is_on_game = False
 frame = 0
 
 if __name__ == "__main__":
-    window = Graphic.Window("Test", 800, 800)
+    window = Graphic.Window("Test")
     start_program = time.time()
     pressed = {}
     play_button = pygame.image.load("resources/jouer.png")
-    Game.init_objects()
+    Game.init_objects(window.get_size())
     while running:
         start = pygame.time.get_ticks()
         for event in pygame.event.get():
@@ -30,7 +28,7 @@ if __name__ == "__main__":
                 coord = pygame.mouse.get_pos()
                 if 200 < coord[0] < 450 and 300 < coord[1] < 416 and not is_on_game:
                     is_on_game = True
-                    Game.reset()
+                    Game.reset(window.get_size())
         # window.draw_text(str(Physics.get_circle_collider_penetration(body.get_collider(), thing.get_collider())), (0, 0), (255, 255, 255), 20)
         window.draw_color((0, 0, 0))
         if is_on_game:

@@ -132,6 +132,14 @@ def get_penetration_coefficient(total_penetration, object_penetration):
     return object_penetration / total_penetration
 
 
+def get_elastic_collision_final_velocity(velocity1, velocity2, mass1, mass2):
+    final_velocity1X = (velocity1[0] * (mass1 - mass2) + 2 * mass2 * velocity2[0]) / (mass1 + mass2)
+    final_velocity1Y = (velocity1[1] * (mass1 - mass2) + 2 * mass2 * velocity2[1]) / (mass1 + mass2)
+    final_velocity2X = (velocity2[0] * (mass2 - mass1) + 2 * mass1 * velocity1[0]) / (mass1 + mass2)
+    final_velocity2Y = (velocity2[1] * (mass2 - mass1) + 2 * mass1 * velocity1[1]) / (mass1 + mass2)
+    return (final_velocity1X, final_velocity1Y), (final_velocity2X, final_velocity2Y)
+
+
 class DynamicCollider:
     def __init__(self, game_object):
         self.game_object = game_object
@@ -212,6 +220,7 @@ class DynamicCollider:
         solve_constraints(self, collider)
 
 
+
 def solve_constraints(dynamic_collider1: DynamicCollider, dynamic_collider2: DynamicCollider): # with energy conservation
     if dynamic_collider1.static:
         print("should not call this function with static collider as first argument")
@@ -263,5 +272,5 @@ def solve_constraints(dynamic_collider1: DynamicCollider, dynamic_collider2: Dyn
 
 
 def reset():
-    global colliders_in_game
-    colliders_in_game = []
+    colliders_in_game.clear()
+
