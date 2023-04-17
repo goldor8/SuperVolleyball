@@ -14,8 +14,8 @@ def init_objects(screen_size):
     ball.set_color((255, 0, 0))
     ball.set_collider(Physics.CircleCollider(ball))
     ball.dynamic_collider.velocity = ball.dynamic_collider.initial_velocity = (400, 0)
-    ball.dynamic_collider.acceleration = ball.dynamic_collider.initial_acceleration = (0, 800)
-    ball.dynamic_collider.bounciness = 0.9
+    ball.dynamic_collider.acceleration = ball.dynamic_collider.initial_acceleration = (0, 1200)
+    ball.dynamic_collider.bounciness = 1
     ball.dynamic_collider.mass = 1
     wall1 = Body((screen_size[0] / 2, 0), (screen_size[0], 10))
     wall1.set_collider(Physics.BoxCollider(wall1))
@@ -66,7 +66,7 @@ def event_keydown(key):
                 player2 = objects
     if key == pygame.K_SPACE and ground.get_collider() in player1.dynamic_collider.get_collisions():
         player1.jump(1600)
-    elif key == pygame.K_UP and ground.get_collider() in player2.dynamic_collider.get_collisions():
+    if key == pygame.K_UP and ground.get_collider() in player2.dynamic_collider.get_collisions():
         player2.jump(1600)
 
 
@@ -145,16 +145,16 @@ class Ball(Body):
 
     def update(self):
         self.dynamic_collider.update()
-        hypothenuse = sqrt(self.dynamic_collider.velocity[0]**2 + self.dynamic_collider.velocity[1]**2)
+        hypothenuse = sqrt(self.dynamic_collider.velocity[0] ** 2 + self.dynamic_collider.velocity[1] ** 2)
         max_velo = 1200
         if hypothenuse > max_velo:
-            x = (self.dynamic_collider.velocity[0]/hypothenuse) * max_velo
+            x = (self.dynamic_collider.velocity[0] / hypothenuse) * max_velo
             y = (self.dynamic_collider.velocity[1] / hypothenuse) * max_velo
             self.dynamic_collider.velocity = (x, y)
         self.draw()
 
 
-class Player (Body):
+class Player(Body):
     def __init__(self, pos, size, image):
         super().__init__(pos, size, image)
         self.is_player1 = True
