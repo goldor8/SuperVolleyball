@@ -154,6 +154,13 @@ class DynamicCollider:
         self.bounciness = 0
         self.collider = None
         self.collisions = []
+        self.on_collision = []
+
+    def register_on_collision(self, function):
+        self.on_collision.append(function)
+
+    def unregister_on_collision(self, function):
+        self.on_collision.remove(function)
 
     def set_collider(self, collider):
         self.collider = collider
@@ -190,7 +197,8 @@ class DynamicCollider:
 
         #self.velocity = (bounce_velocity[0] * self.bounciness, bounce_velocity[1] * self.bounciness)
         #self.game_object.pos = (self.game_object.pos[0] - penetration_sum[0], self.game_object.pos[1] - penetration_sum[1])  # correct object intersection
-
+        for function in self.on_collision:
+            function(self.game_object, objects_colliding)
         for collider in objects_colliding:
             if isinstance(collider.game_object, Game.Body):
                 self._resolve_collision(collider.game_object.dynamic_collider)
