@@ -85,7 +85,7 @@ def detect_end():
             ball = objects
         if objects.is_ground:
             ground = objects
-    if ground.dynamic_collider.get_colliders() in ball.dynamic_collider.get_collisions():
+    if ground.dynamic_collider.get_collider() in ball.dynamic_collider.get_collisions():
         return True
     return False
 
@@ -173,3 +173,22 @@ class Player(Body):
 
     def jump(self, speed):
         self.dynamic_collider.velocity = (self.dynamic_collider.velocity[0], -speed)
+
+
+class PowerUp(GameObject):
+    def __init__(self, pos, size, image):
+        super().__init__(pos, size, image)
+        self.dynamic_collider = Physics.DynamicCollider(self)
+        self.dynamic_collider.collider = Physics.CircleCollider(self)
+
+    def power_trigger(self, player):
+        pass
+
+    def update(self):
+        self.dynamic_collider.update()
+        self.draw()
+        for collider in self.dynamic_collider.get_collisions():
+            if isinstance(collider.gameObject, Player):
+                self.power_trigger(collider.gameObject)
+                all_objects.remove(self)
+                break

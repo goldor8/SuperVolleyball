@@ -155,10 +155,10 @@ class DynamicCollider:
         self.collider = None
         self.collisions = []
 
-    def set_colliders(self, collider):
+    def set_collider(self, collider):
         self.collider = collider
 
-    def get_colliders(self):
+    def get_collider(self):
         return self.collider
 
     def update(self):
