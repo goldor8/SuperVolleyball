@@ -10,13 +10,6 @@ all_objects = []
 
 
 def init_objects(screen_size):
-    ball = Ball((random.randint(10, screen_size[0] - 10), screen_size[1] / 5), (66, 66), pygame.transform.scale(pygame.image.load("resources/ball.png"), (66, 66)))
-    ball.set_color((255, 0, 0))
-    ball.set_collider(Physics.CircleCollider(ball))
-    ball.dynamic_collider.velocity = ball.dynamic_collider.initial_velocity = (400, 0)
-    ball.dynamic_collider.acceleration = ball.dynamic_collider.initial_acceleration = (0, 1200)
-    ball.dynamic_collider.bounciness = 1
-    ball.dynamic_collider.mass = 1
     wall1 = Body((screen_size[0] / 2, 0), (screen_size[0], 10))
     wall1.set_collider(Physics.BoxCollider(wall1))
     wall1.set_static(True)
@@ -39,17 +32,32 @@ def init_objects(screen_size):
     net.set_static(True)
     net.set_color((0, 0, 255))
     character_size = 150
-    player1 = Player((screen_size[0] * 1 / 4, screen_size[1] / 2), (character_size, character_size), pygame.transform.scale(pygame.image.load("resources/bonhomme.png"), (character_size, character_size)))
+    player1 = Player((screen_size[0] * 1 / 4, screen_size[1] / 2), (character_size, character_size),
+                     pygame.transform.scale(pygame.image.load("resources/bonhomme.png"),
+                                            (character_size, character_size)))
     player1.set_collider(Physics.CircleCollider(player1))
     player1.dynamic_collider.acceleration = player1.dynamic_collider.initial_acceleration = (0, 4000)
     player1.dynamic_collider.air_friction = 0.5
     player1.dynamic_collider.mass = 50
-    player2 = Player((screen_size[0] * 3 / 4, screen_size[1] / 2), (character_size, character_size), pygame.transform.scale(pygame.image.load("resources/bonhomme.png"), (character_size, character_size)))
+    player2 = Player((screen_size[0] * 3 / 4, screen_size[1] / 2), (character_size, character_size),
+                     pygame.transform.scale(pygame.image.load("resources/bonhomme.png"),
+                                            (character_size, character_size)))
     player2.set_collider(Physics.CircleCollider(player2))
     player2.dynamic_collider.acceleration = player2.dynamic_collider.initial_acceleration = (0, 4000)
     player2.dynamic_collider.air_friction = 0.5
     player2.dynamic_collider.mass = 50
     player2.is_player1 = False
+    ball = Ball((random.randint(10, screen_size[0] - 10), screen_size[1] / 5), (66, 66),
+                pygame.transform.scale(pygame.image.load("resources/ball.png"), (66, 66)))
+    ball.set_color((255, 0, 0))
+    ball.set_collider(Physics.CircleCollider(ball))
+    ball.dynamic_collider.velocity = ball.dynamic_collider.initial_velocity = (400, 0)
+    ball.dynamic_collider.acceleration = ball.dynamic_collider.initial_acceleration = (0, 1200)
+    ball.dynamic_collider.bounciness = 1
+    ball.dynamic_collider.mass = 1
+    boxing_glove_power_up = BoxingGlovePowerUp((random.randint(10, screen_size[0] - 10), screen_size[1] / 5),(106, 150))
+    boxing_glove_power_up.dynamic_collider.set_collider(Physics.BoxCollider(boxing_glove_power_up))
+    boxing_glove_power_up.dynamic_collider.acceleration = (0, 1200)
 
 
 def event_keydown(key):
@@ -111,9 +119,11 @@ class GameObject:
     def draw(self):
         window = Graphic.Window.main_window
         if self.image is not None:
-            window.screen.blit(self.image, (self.pos[0] - self.size[0] / 2, self.pos[1] - self.size[1] / 2, self.size[0], self.size[1]))
+            window.screen.blit(self.image, (
+            self.pos[0] - self.size[0] / 2, self.pos[1] - self.size[1] / 2, self.size[0], self.size[1]))
         else:
-            pygame.draw.rect(window.screen, self.color, (self.pos[0] - self.size[0] / 2, self.pos[1] - self.size[1] / 2, self.size[0], self.size[1]))
+            pygame.draw.rect(window.screen, self.color, (
+            self.pos[0] - self.size[0] / 2, self.pos[1] - self.size[1] / 2, self.size[0], self.size[1]))
 
     def update(self):
         self.draw()
@@ -175,7 +185,7 @@ class Player(Body):
         self.dynamic_collider.velocity = (self.dynamic_collider.velocity[0], -speed)
 
 
-class PowerUp(GameObject):
+class PowerUp(Body):
     def __init__(self, pos, size, image):
         super().__init__(pos, size, image)
         self.dynamic_collider = Physics.DynamicCollider(self)
@@ -188,7 +198,54 @@ class PowerUp(GameObject):
         self.dynamic_collider.update()
         self.draw()
         for collider in self.dynamic_collider.get_collisions():
-            if isinstance(collider.gameObject, Player):
-                self.power_trigger(collider.gameObject)
+            if isinstance(collider.game_object, Player):
+                self.power_trigger(collider.game_object)
                 all_objects.remove(self)
                 break
+
+
+class BoxingGlovePowerUp(PowerUp):
+    def __init__(self, pos, size):
+        super().__init__(pos, size, pygame.image.load("resources/boxing_glove.png"))
+
+    def power_trigger(self, player):
+        player.dynamic_collider.register_on_collision(self.punch)
+
+    def punch(self, player, colliders):
+        for collider in colliders:
+            if isinstance(collider.game_object, Ball):
+                collider.game_object.dynamic_collider.velocity = (player.dynamic_collider.velocity[0] * 10, player.dynamic_collider.velocity[1] * 10)
+                player.dynamic_collider.unregister_on_collision(self.punch)
+                break
+
+
+class IceCubePowerUp(PowerUp):
+    def __init__(self, pos, size, image):
+        super().__init__(pos, size, image)
+
+    def power_trigger(self, player):
+        pass
+
+
+class ReversePowerUp(PowerUp):
+    def __init__(self, pos, size, image):
+        super().__init__(pos, size, image)
+
+    def power_trigger(self, player):
+        pass
+
+
+class StopPowerUp(PowerUp):
+    def __init__(self, pos, size, image):
+        super().__init__(pos, size, image)
+
+    def power_trigger(self, player):
+        pass
+
+
+class TwoBallsPowerUp(PowerUp):
+    def __init__(self, pos, size, image):
+        super().__init__(pos, size, image)
+
+    def power_trigger(self, player):
+        pass
