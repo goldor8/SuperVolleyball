@@ -9,41 +9,41 @@ timeStep = 1 / 200
 all_objects = []
 
 
-def init_objects(size):
-    ball = Ball((random.randint(10, size[0]-10), size[1] / 5), (33, 33), pygame.image.load("resources/ball.png"))
+def init_objects(screen_size):
+    ball = Ball((random.randint(10, screen_size[0] - 10), screen_size[1] / 5), (66, 66), pygame.transform.scale(pygame.image.load("resources/ball.png"), (66, 66)))
     ball.set_color((255, 0, 0))
     ball.set_collider(Physics.CircleCollider(ball))
     ball.dynamic_collider.velocity = ball.dynamic_collider.initial_velocity = (400, 0)
     ball.dynamic_collider.acceleration = ball.dynamic_collider.initial_acceleration = (0, 800)
     ball.dynamic_collider.bounciness = 0.9
     ball.dynamic_collider.mass = 1
-    wall1 = Body((size[0]/2, 0), (size[0], 10))
+    wall1 = Body((screen_size[0] / 2, 0), (screen_size[0], 10))
     wall1.set_collider(Physics.BoxCollider(wall1))
     wall1.set_static(True)
     wall1.set_color((0, 0, 255))
-    wall2 = Body((0, size[1]/2), (10, size[1]))
+    wall2 = Body((0, screen_size[1] / 2), (10, screen_size[1]))
     wall2.set_collider(Physics.BoxCollider(wall2))
     wall2.set_static(True)
     wall2.set_color((0, 0, 255))
-    ground = Body((size[0]/2, size[1]), (size[0], 10))
+    ground = Body((screen_size[0] / 2, screen_size[1]), (screen_size[0], 10))
     ground.set_collider(Physics.BoxCollider(ground))
     ground.set_static(True)
     ground.set_color((0, 0, 255))
     ground.is_ground = True
-    wall4 = Body((size[0], size[1]/2), (10, size[1]))
+    wall4 = Body((screen_size[0], screen_size[1] / 2), (10, screen_size[1]))
     wall4.set_collider(Physics.BoxCollider(wall4))
     wall4.set_static(True)
     wall4.set_color((0, 0, 255))
-    net = Body((size[0]/2, size[1] * 5/6), (10, size[1]/3))
+    net = Body((screen_size[0] / 2, screen_size[1] * 5 / 6), (10, screen_size[1] / 3))
     net.set_collider(Physics.BoxCollider(net))
     net.set_static(True)
     net.set_color((0, 0, 255))
-    player1 = Player((size[0] * 1/4, size[1] / 2), (128, 128), pygame.image.load("resources/Bonhomme.png"))
+    player1 = Player((screen_size[0] * 1 / 4, screen_size[1] / 2), (128, 128), pygame.image.load("resources/Bonhomme.png"))
     player1.set_collider(Physics.CircleCollider(player1))
     player1.dynamic_collider.acceleration = player1.dynamic_collider.initial_acceleration = (0, 4000)
     player1.dynamic_collider.air_friction = 0.5
     player1.dynamic_collider.mass = 50
-    player2 = Player((size[0] * 3/4, size[1] / 2), (128, 128), pygame.image.load("resources/Bonhomme.png"))
+    player2 = Player((screen_size[0] * 3 / 4, screen_size[1] / 2), (128, 128), pygame.image.load("resources/Bonhomme.png"))
     player2.set_collider(Physics.CircleCollider(player2))
     player2.dynamic_collider.acceleration = player2.dynamic_collider.initial_acceleration = (0, 4000)
     player2.dynamic_collider.air_friction = 0.5

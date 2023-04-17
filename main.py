@@ -7,6 +7,8 @@ running = True
 is_on_game = False
 frame = 0
 
+background = pygame.image.load("resources/background.jpg")
+
 if __name__ == "__main__":
     window = Graphic.Window("Test")
     start_program = time.time()
@@ -30,7 +32,7 @@ if __name__ == "__main__":
                     is_on_game = True
                     Game.reset(window.get_size())
         # window.draw_text(str(Physics.get_circle_collider_penetration(body.get_collider(), thing.get_collider())), (0, 0), (255, 255, 255), 20)
-        window.draw_color((0, 0, 0))
+        window.draw_image(background, (0, 0), window.get_size())
         if is_on_game:
             Game.update(pressed)
             if Game.detect_end():
