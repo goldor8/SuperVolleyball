@@ -38,12 +38,13 @@ def init_objects(screen_size):
     net.set_collider(Physics.BoxCollider(net))
     net.set_static(True)
     net.set_color((0, 0, 255))
-    player1 = Player((screen_size[0] * 1 / 4, screen_size[1] / 2), (128, 128), pygame.image.load("resources/Bonhomme.png"))
+    character_size = 150
+    player1 = Player((screen_size[0] * 1 / 4, screen_size[1] / 2), (character_size, character_size), pygame.transform.scale(pygame.image.load("resources/bonhomme.png"), (character_size, character_size)))
     player1.set_collider(Physics.CircleCollider(player1))
     player1.dynamic_collider.acceleration = player1.dynamic_collider.initial_acceleration = (0, 4000)
     player1.dynamic_collider.air_friction = 0.5
     player1.dynamic_collider.mass = 50
-    player2 = Player((screen_size[0] * 3 / 4, screen_size[1] / 2), (128, 128), pygame.image.load("resources/Bonhomme.png"))
+    player2 = Player((screen_size[0] * 3 / 4, screen_size[1] / 2), (character_size, character_size), pygame.transform.scale(pygame.image.load("resources/bonhomme.png"), (character_size, character_size)))
     player2.set_collider(Physics.CircleCollider(player2))
     player2.dynamic_collider.acceleration = player2.dynamic_collider.initial_acceleration = (0, 4000)
     player2.dynamic_collider.air_friction = 0.5
