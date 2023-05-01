@@ -25,8 +25,8 @@ class Window:
     def draw_game_object(self, game_object: GameObject):
         game_object.draw(self)
 
-    def draw_image(self, image, pos, size):
-        self.screen.blit(pygame.transform.scale(image, size), pos)
+    def draw_image(self, image, pos):
+        self.screen.blit(image, pos)
 
     def draw_text(self, text, pos, color, size):
         font = pygame.font.SysFont("comicsansms", size)
