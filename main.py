@@ -15,6 +15,7 @@ if __name__ == "__main__":
     pressed = {}
     play_button = pygame.image.load("resources/jouer.png")
     Game.init_objects(window.get_size())
+    background = pygame.transform.scale(background, window.get_size())
     while running:
         start = pygame.time.get_ticks()
         for event in pygame.event.get():
@@ -32,7 +33,7 @@ if __name__ == "__main__":
                     is_on_game = True
                     Game.reset(window.get_size())
         # window.draw_text(str(Physics.get_circle_collider_penetration(body.get_collider(), thing.get_collider())), (0, 0), (255, 255, 255), 20)
-        window.draw_image(background, (0, 0), window.get_size())
+        window.draw_image(background, (0, 0))
         if is_on_game:
             Game.update(pressed)
             if Game.detect_end():

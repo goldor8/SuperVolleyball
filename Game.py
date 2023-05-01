@@ -5,7 +5,7 @@ import pygame
 import Graphic
 import Physics
 
-timeStep = 1 / 200
+timeStep = 1 / 150
 all_objects = []
 
 
@@ -56,7 +56,6 @@ def init_objects(screen_size):
     ball.dynamic_collider.bounciness = 1
     ball.dynamic_collider.mass = 1
     boxing_glove_power_up = BoxingGlovePowerUp((random.randint(10, screen_size[0] - 10), screen_size[1] / 5),(106, 150))
-    boxing_glove_power_up.dynamic_collider.set_collider(Physics.BoxCollider(boxing_glove_power_up))
     boxing_glove_power_up.dynamic_collider.acceleration = (0, 1200)
 
 
@@ -128,6 +127,9 @@ class GameObject:
     def update(self):
         self.draw()
 
+    def delete(self):
+        all_objects.remove(self)
+
 
 class Body(GameObject):
     def __init__(self, pos, size, image=None):
@@ -147,6 +149,10 @@ class Body(GameObject):
     def update(self):
         self.dynamic_collider.update()
         super().draw()
+
+    def delete(self):
+        super().delete()
+        self.dynamic_collider.delete()
 
 
 class Ball(Body):
@@ -195,12 +201,12 @@ class PowerUp(Body):
         pass
 
     def update(self):
-        self.dynamic_collider.update()
-        self.draw()
+        super().update()
+        if(len(self.dynamic_collider.get_collisions()) > 1):
+            pass
         for collider in self.dynamic_collider.get_collisions():
             if isinstance(collider.game_object, Player):
                 self.power_trigger(collider.game_object)
-                all_objects.remove(self)
                 break
 
 
@@ -210,6 +216,7 @@ class BoxingGlovePowerUp(PowerUp):
 
     def power_trigger(self, player):
         player.dynamic_collider.register_on_collision(self.punch)
+        self.delete()
 
     def punch(self, player, colliders):
         for collider in colliders:

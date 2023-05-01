@@ -16,6 +16,8 @@ class Collider:
     def on_collision(self, other):
         pass
 
+    def delete(self):
+        colliders_in_game.remove(self)
 
 class BoxCollider(Collider):
     def __init__(self, game_object, size=None):
@@ -183,6 +185,9 @@ class DynamicCollider:
             if len(objects_collidings) > 0:
                 self._on_collision(objects_collidings)
 
+    def delete(self):
+        if self.collider is not None:
+            self.collider.delete()
 
     def _on_collision(self, objects_colliding, should_resolve=True):
         # penetration_sum = self.get_penetration(objects_colliding)
@@ -197,25 +202,25 @@ class DynamicCollider:
 
         #self.velocity = (bounce_velocity[0] * self.bounciness, bounce_velocity[1] * self.bounciness)
         #self.game_object.pos = (self.game_object.pos[0] - penetration_sum[0], self.game_object.pos[1] - penetration_sum[1])  # correct object intersection
-        for function in self.on_collision:
-            function(self.game_object, objects_colliding)
         if should_resolve:
             for collider in objects_colliding:
                 if isinstance(collider.game_object, Game.Body):
                     self._resolve_collision(collider.game_object.dynamic_collider)
+        for function in self.on_collision:
+            function(self.game_object, objects_colliding)
 
     def _get_kinetic_energy(self, velocity_vect):
         return (self.mass * velocity_vect ** 2) / 2
 
-    def _get_instant_collisions(self):
+    def _get_instant_collisions(self) -> list:
         colliders_to_check = colliders_in_game.copy()
         colliders_to_check.remove(self.collider)
         return get_collider_colliding(self.collider, colliders_to_check)
 
-    def get_collisions(self):
+    def get_collisions(self) -> list:
         return self.collisions
 
-    def _set_collisions(self, collisions):
+    def _set_collisions(self, collisions: list):
         self.collisions = collisions
 
     def get_penetration(self, colliders):
@@ -227,7 +232,6 @@ class DynamicCollider:
 
     def _resolve_collision(self, collider):
         solve_constraints(self, collider)
-        collider._on_collision([self], False)
 
 
 
