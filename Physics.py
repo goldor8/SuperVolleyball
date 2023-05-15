@@ -4,7 +4,7 @@ import MathUtil
 
 colliders_in_game = []
 collision_pairs = []
-
+use_equations = True
 
 class Collider:
     def __init__(self, game_object):
@@ -180,8 +180,15 @@ class DynamicCollider:
             return
         self.velocity = (self.velocity[0] + self.acceleration[0] * Game.timeStep,
                          self.velocity[1] + self.acceleration[1] * Game.timeStep)
-        self.game_object.pos = (self.game_object.pos[0] + self.velocity[0] * Game.timeStep,
-                                self.game_object.pos[1] + self.velocity[1] * Game.timeStep)
+
+        if use_equations:
+            newPosx = self.game_object.pos[0] + self.velocity[0] * Game.timeStep + (self.acceleration[0] * Game.timeStep ** 2) / 2
+            newPosy = self.game_object.pos[1] + self.velocity[1] * Game.timeStep + (self.acceleration[1] * Game.timeStep ** 2) / 2
+            self.game_object.pos = (newPosx, newPosy)
+        else:
+            self.game_object.pos = (self.game_object.pos[0] + self.velocity[0] * Game.timeStep,
+                                    self.game_object.pos[1] + self.velocity[1] * Game.timeStep)
+
         self.velocity = (self.velocity[0] * (1 - self.air_friction * Game.timeStep),
                          self.velocity[1] * (1 - self.air_friction * Game.timeStep))
 
