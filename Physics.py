@@ -170,6 +170,8 @@ class DynamicCollider:
         self.on_collision.remove(function)
 
     def set_collider(self, collider):
+        if self.collider is not None:
+            self.collider.delete()
         self.collider = collider
 
     def get_collider(self):

@@ -160,7 +160,7 @@ class Body(GameObject):
         self.dynamic_collider.static = static
 
     def set_collider(self, collider):
-        self.dynamic_collider.collider = collider
+        self.dynamic_collider.set_collider(collider)
 
     def get_collider(self):
         return self.dynamic_collider.collider
