@@ -1,5 +1,6 @@
 import asyncio
 import random
+import time
 from math import sqrt
 
 import pygame
@@ -286,9 +287,18 @@ class IceCubePowerUp(PowerUp):
             self.freeze_player(self.player1)
         self.delete()
 
-    def freeze_player(self, player):
+    def freeze_player(self, player, freezeTime=0.8):
         player.image = pygame.transform.scale(pygame.image.load("resources/bonhomme_freeze.png"), (200, 200))
+        player.pos = (player.pos[0], player.pos[1] - 50)
         player.set_static(True)
+        startTime = pygame.time.get_ticks()
+        def freezeTimer():
+            if pygame.time.get_ticks() - startTime > freezeTime * 1000:
+                self.unfreeze(player)
+                unregister_update_loop(freezeTimer)
+
+        register_update_loop(freezeTimer)
+
 
     def unfreeze(self, player):
         player.image = pygame.transform.scale(pygame.image.load("resources/bonhomme.png"), player.size)
