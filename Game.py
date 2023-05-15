@@ -58,8 +58,13 @@ def init_objects(screen_size):
     ball.dynamic_collider.acceleration = ball.dynamic_collider.initial_acceleration = (0, 1200)
     ball.dynamic_collider.bounciness = 1
     ball.dynamic_collider.mass = 1
-    boxing_glove_power_up = BoxingGlovePowerUp((random.randint(10, screen_size[0] - 10), screen_size[1] / 5),(106, 150))
-    boxing_glove_power_up.dynamic_collider.acceleration = (0, 1200)
+    ball.set_static(True)
+    ice_cube_power_up = IceCubePowerUp((random.randint(50, screen_size[0]-50), 55), (50, 50),
+                                        pygame.transform.scale(pygame.image.load("resources/ice_cube.png"), (100, 100)),
+                                        player1, player2)
+    ice_cube_power_up.set_collider(Physics.CircleCollider(ice_cube_power_up))
+    ice_cube_power_up.dynamic_collider.velocity = ice_cube_power_up.dynamic_collider.initial_velocity = (0, 0)
+    ice_cube_power_up.dynamic_collider.acceleration = ice_cube_power_up.dynamic_collider.initial_acceleration = (0, 100)
 
 
 def event_keydown(key):
@@ -269,11 +274,25 @@ class BoxingGlovePowerUp(PowerUp):
 
 
 class IceCubePowerUp(PowerUp):
-    def __init__(self, pos, size, image):
+    def __init__(self, pos, size, image, player1, player2):
         super().__init__(pos, size, image)
+        self.player1 = player1
+        self.player2 = player2
 
     def power_trigger(self, player):
-        pass
+        if player == self.player1:
+            self.freeze_player(self.player2)
+        else:
+            self.freeze_player(self.player1)
+        self.delete()
+
+    def freeze_player(self, player):
+        player.image = pygame.transform.scale(pygame.image.load("resources/bonhomme_freeze.png"), (200, 200))
+        player.set_static(True)
+
+    def unfreeze(self, player):
+        player.image = pygame.transform.scale(pygame.image.load("resources/bonhomme.png"), player.size)
+        player.set_static(False)
 
 
 class ReversePowerUp(PowerUp):
