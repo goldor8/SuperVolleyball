@@ -1,7 +1,10 @@
+import asyncio
 import random
 from math import sqrt
 
 import pygame
+
+import Game
 import Graphic
 import Physics
 
@@ -78,6 +81,7 @@ def event_keydown(key):
 
 
 def update(pressed):
+    Physics.update(timeStep)
     for gameObject in all_objects:
         gameObject.update()
         if isinstance(gameObject, Player):
@@ -158,16 +162,17 @@ class Body(GameObject):
 class Ball(Body):
     def __init__(self, pos, size, image):
         super().__init__(pos, size, image)
+        self.max_speed = 1200
 
     def update(self):
         self.dynamic_collider.update()
         hypothenuse = sqrt(self.dynamic_collider.velocity[0] ** 2 + self.dynamic_collider.velocity[1] ** 2)
-        max_velo = 1200
-        if hypothenuse > max_velo:
-            x = (self.dynamic_collider.velocity[0] / hypothenuse) * max_velo
-            y = (self.dynamic_collider.velocity[1] / hypothenuse) * max_velo
+        if hypothenuse > self.max_speed:
+            x = (self.dynamic_collider.velocity[0] / hypothenuse) * self.max_speed
+            y = (self.dynamic_collider.velocity[1] / hypothenuse) * self.max_speed
             self.dynamic_collider.velocity = (x, y)
         self.draw()
+
 
 
 class Player(Body):
@@ -181,11 +186,15 @@ class Player(Body):
                 self.dynamic_collider.velocity = (-speed, self.dynamic_collider.velocity[1])
             elif pressed.get(pygame.K_d):
                 self.dynamic_collider.velocity = (speed, self.dynamic_collider.velocity[1])
+            else:
+                self.dynamic_collider.velocity = (0, self.dynamic_collider.velocity[1])
         else:
             if pressed.get(pygame.K_LEFT):
                 self.dynamic_collider.velocity = (-speed, self.dynamic_collider.velocity[1])
             elif pressed.get(pygame.K_RIGHT):
                 self.dynamic_collider.velocity = (speed, self.dynamic_collider.velocity[1])
+            else:
+                self.dynamic_collider.velocity = (0, self.dynamic_collider.velocity[1])
 
     def jump(self, speed):
         self.dynamic_collider.velocity = (self.dynamic_collider.velocity[0], -speed)
@@ -221,9 +230,29 @@ class BoxingGlovePowerUp(PowerUp):
     def punch(self, player, colliders):
         for collider in colliders:
             if isinstance(collider.game_object, Ball):
-                collider.game_object.dynamic_collider.velocity = (player.dynamic_collider.velocity[0] * 10, player.dynamic_collider.velocity[1] * 10)
+                collider.game_object.dynamic_collider.velocity = (collider.game_object.dynamic_collider.velocity[0] * 4, collider.game_object.dynamic_collider.velocity[1] * 4)
+                collider.game_object.max_speed = 2400
+                collider.game_object.dynamic_collider.register_on_collision(self.reset_ball_speed(collider.game_object, 1200))
+                #asyncio.run(self.reset_speed_smoothly(collider.game_object, 1200, 0.5))
                 player.dynamic_collider.unregister_on_collision(self.punch)
                 break
+
+    def reset_ball_speed(self, ball, speed):
+        def reset_speed(player, colliders):
+            ball.max_speed = speed
+            ball.dynamic_collider.unregister_on_collision(reset_speed)
+
+        return reset_speed
+
+    async def reset_speed_smoothly(self, ball, speed, time):
+        async def loop():
+            steps = time / Game.timeStep
+            while ball.max_speed > speed:
+                ball.max_speed -= (ball.max_speed - speed)/steps
+                await asyncio.sleep(Game.timeStep)
+            ball.max_speed = speed
+
+        asyncio.create_task(loop())
 
 
 class IceCubePowerUp(PowerUp):
