@@ -10,7 +10,7 @@ import Physics
 
 timeStep = 1 / 150
 all_objects = []
-
+update_loop = []
 
 def init_objects(screen_size):
     wall1 = Body((screen_size[0] / 2, 0), (screen_size[0], 10))
@@ -80,12 +80,22 @@ def event_keydown(key):
         player2.jump(1600)
 
 
+def register_update_loop(loop):
+    update_loop.append(loop)
+
+
+def unregister_update_loop(loop):
+    update_loop.remove(loop)
+
+
 def update(pressed):
     Physics.update(timeStep)
     for gameObject in all_objects:
         gameObject.update()
         if isinstance(gameObject, Player):
             gameObject.move(500, pressed)
+    for loop in update_loop:
+        loop()
 
 
 def detect_end():
@@ -232,8 +242,8 @@ class BoxingGlovePowerUp(PowerUp):
             if isinstance(collider.game_object, Ball):
                 collider.game_object.dynamic_collider.velocity = (collider.game_object.dynamic_collider.velocity[0] * 4, collider.game_object.dynamic_collider.velocity[1] * 4)
                 collider.game_object.max_speed = 2400
-                collider.game_object.dynamic_collider.register_on_collision(self.reset_ball_speed(collider.game_object, 1200))
-                #asyncio.run(self.reset_speed_smoothly(collider.game_object, 1200, 0.5))
+                #collider.game_object.dynamic_collider.register_on_collision(self.reset_ball_speed(collider.game_object, 1200))
+                self.reset_speed_smoothly(collider.game_object, 1200, 1.5)
                 player.dynamic_collider.unregister_on_collision(self.punch)
                 break
 
@@ -244,15 +254,18 @@ class BoxingGlovePowerUp(PowerUp):
 
         return reset_speed
 
-    async def reset_speed_smoothly(self, ball, speed, time):
-        async def loop():
+    def reset_speed_smoothly(self, ball, speed, time):
+        def loop():
             steps = time / Game.timeStep
-            while ball.max_speed > speed:
+            if ball.max_speed > speed:
                 ball.max_speed -= (ball.max_speed - speed)/steps
-                await asyncio.sleep(Game.timeStep)
+                return
             ball.max_speed = speed
+            unregister_update_loop(loop)
 
-        asyncio.create_task(loop())
+        # loop = asyncio.get_event_loop()
+        # loop.run_in_executor(None, loop)
+        register_update_loop(loop)
 
 
 class IceCubePowerUp(PowerUp):
