@@ -7,20 +7,25 @@ collision_pairs = []
 use_equations = True
 
 class Collider:
+    """Base class for all colliders"""
     def __init__(self, game_object):
         self.game_object = game_object
         colliders_in_game.append(self)
 
     def get_pos(self):
+        """Return the position of game_object attached to the collider"""
         return self.game_object.pos
 
     def on_collision(self, other):
+        """Called when the collider collides with another collider"""
         pass
 
     def delete(self):
+        """Remove collider from the physics engine"""
         colliders_in_game.remove(self)
 
 class BoxCollider(Collider):
+    """A collider that represents a box"""
     def __init__(self, game_object, size=None):
         super().__init__(game_object)
         if size is None:
@@ -29,6 +34,7 @@ class BoxCollider(Collider):
 
 
 class CircleCollider(Collider):
+    """A collider that represents a circle"""
     def __init__(self, game_object, radius=None):
         super().__init__(game_object)
         if radius is None:
@@ -38,19 +44,23 @@ class CircleCollider(Collider):
 
 
 def AABB_collision(pos1, size1, pos2, size2):
+    """Check if two boxes are colliding"""
     return pos1[0] - size1[0] / 2 < pos2[0] + size2[0] / 2 and pos1[0] + size1[0] / 2 > pos2[0] - size2[0] / 2 and pos1[
         1] - size1[1] / 2 < pos2[1] + size2[1] / 2 and pos1[1] + size1[1] / 2 > pos2[1] - size2[1] / 2
 
 
 def circle_collision(pos1, radius1, pos2, radius2):
+    """Check if two circles are colliding"""
     return (pos2[0] - pos1[0]) ** 2 + (pos2[1] - pos1[1]) ** 2 < (radius1 + radius2) ** 2
 
 
 def get_box_collider_penetration(box_collider1: BoxCollider, boc_collider2: BoxCollider):
+    """Return the penetration of two box colliders"""
     return get_box_penetration(box_collider1.get_pos(), box_collider1.size, boc_collider2.get_pos(), boc_collider2.size)
 
 
 def get_box_penetration(pos1, size1, pos2, size2):
+    """Return the penetration of two boxes"""
     y_penetration = 0
     x_penetration = 0
     if pos1[1] - size1[1] / 2 < pos2[1] + size2[1] / 2 and pos1[1] + size1[1] / 2 > pos2[1] - size2[1] / 2:
@@ -72,11 +82,13 @@ def get_box_penetration(pos1, size1, pos2, size2):
 
 
 def get_circle_collider_penetration(circle_collider1: CircleCollider, circle_collider2: CircleCollider):
+    """Return the penetration of two circle colliders"""
     return get_circle_penetration(circle_collider1.get_pos(), circle_collider1.radius, circle_collider2.get_pos(),
                                   circle_collider2.radius)
 
 
 def get_circle_penetration(pos1, radius1, pos2, radius2):
+    """Return the penetration of two circles"""
     x_penetration = 0
     y_penetration = 0
     if circle_collision(pos1, radius1, pos2, radius2):
@@ -88,6 +100,7 @@ def get_circle_penetration(pos1, radius1, pos2, radius2):
 
 
 def is_colliding(collider1: Collider, collider2: Collider):
+    """Check if two colliders are colliding"""
     colliding = False
     if isinstance(collider1, BoxCollider) and isinstance(collider2, BoxCollider):
         colliding = AABB_collision(collider1.get_pos(), collider1.size, collider2.get_pos(), collider2.size)
@@ -106,6 +119,7 @@ def is_colliding(collider1: Collider, collider2: Collider):
 
 
 def get_penetration(collider1: Collider, collider2: Collider):
+    """Return the penetration of two colliders"""
     if isinstance(collider1, BoxCollider) and isinstance(collider2, BoxCollider):
         return get_box_collider_penetration(collider1, collider2)
     elif isinstance(collider1, CircleCollider) and isinstance(collider2, CircleCollider):
@@ -120,6 +134,7 @@ def get_penetration(collider1: Collider, collider2: Collider):
 
 
 def get_collider_colliding(collider: Collider, colliders: list) -> list:
+    """Return a list of colliders colliding with the collider"""
     collider_colliding = []
     for c in colliders:
         if is_colliding(collider, c):
@@ -128,6 +143,7 @@ def get_collider_colliding(collider: Collider, colliders: list) -> list:
 
 
 def get_penetration_with_all(collider: Collider, colliders: list) -> list:
+    """Return a list of penetration of the collider with all the colliders"""
     penetration = []
     for c in colliders:
         if is_colliding(collider, c):
@@ -135,20 +151,9 @@ def get_penetration_with_all(collider: Collider, colliders: list) -> list:
     return penetration
 
 
-def get_penetration_coefficient(total_penetration, object_penetration):
-    return object_penetration / total_penetration
-
-
-def get_elastic_collision_final_velocity(velocity1, velocity2, mass1, mass2):
-    final_velocity1X = (velocity1[0] * (mass1 - mass2) + 2 * mass2 * velocity2[0]) / (mass1 + mass2)
-    final_velocity1Y = (velocity1[1] * (mass1 - mass2) + 2 * mass2 * velocity2[1]) / (mass1 + mass2)
-    final_velocity2X = (velocity2[0] * (mass2 - mass1) + 2 * mass1 * velocity1[0]) / (mass1 + mass2)
-    final_velocity2Y = (velocity2[1] * (mass2 - mass1) + 2 * mass1 * velocity1[1]) / (mass1 + mass2)
-    return (final_velocity1X, final_velocity1Y), (final_velocity2X, final_velocity2Y)
-
-
 class DynamicCollider:
-    def __init__(self, game_object):
+    """A collider that can move and collide with other colliders"""
+    def __init__(self, game_object: Game.GameObject):
         self.game_object = game_object
         self.static = False
         self.initial_velocity = (0, 0)
@@ -164,20 +169,25 @@ class DynamicCollider:
         self.on_collision = []
 
     def register_on_collision(self, function):
+        """Register a function to be called when the collider collides with another collider"""
         self.on_collision.append(function)
 
     def unregister_on_collision(self, function):
+        """Unregister a function to be called when the collider collides with another collider"""
         self.on_collision.remove(function)
 
-    def set_collider(self, collider):
+    def set_collider(self, collider: list):
+        """Set the current collider (circle or box) of the dynamic collider"""
         if self.collider is not None:
             self.collider.delete()
         self.collider = collider
 
     def get_collider(self):
+        """Return the collider of the dynamic collider"""
         return self.collider
 
     def update_dynamic(self):
+        """Update the dynamic collider"""
         if self.static:
             return
         self.velocity = (self.velocity[0] + self.acceleration[0] * Game.timeStep,
@@ -195,37 +205,18 @@ class DynamicCollider:
                          self.velocity[1] * (1 - self.air_friction * Game.timeStep))
 
     def update(self):
-        # if self.static:
-        #     return
-        # self.velocity = (self.velocity[0] + self.acceleration[0] * Game.timeStep,
-        #                  self.velocity[1] + self.acceleration[1] * Game.timeStep)
-        # self.game_object.pos = (self.game_object.pos[0] + self.velocity[0] * Game.timeStep,
-        #                         self.game_object.pos[1] + self.velocity[1] * Game.timeStep)
-        # self.velocity = (self.velocity[0] * (1 - self.air_friction * Game.timeStep),
-        #                  self.velocity[1] * (1 - self.air_friction * Game.timeStep))
+        """Update the dynamic collider (called by the game object)"""
         if self.collider is not None:
-            # objects_collidings = self._get_instant_collisions()
-            # self._set_collisions(objects_collidings)
             if len(self.collisions) > 0:
                 self._on_collision(self.collisions, False)
 
     def delete(self):
+        """Delete the dynamic collider"""
         if self.collider is not None:
             self.collider.delete()
 
     def _on_collision(self, objects_colliding, should_resolve=True):
-        # penetration_sum = self.get_penetration(objects_colliding)
-        # penetration_normal = math.atan2(-penetration_sum[1], -penetration_sum[0])
-        #
-        # velocity_angle = math.atan2(self.velocity[1], self.velocity[0])
-        # velocity_magnitude = MathUtil.magnitude(self.velocity)
-        # angle_difference = velocity_angle - penetration_normal
-        #
-        # bounce_angle = math.atan2(math.sin(angle_difference), -math.cos(angle_difference)) + penetration_normal
-        # bounce_velocity = (velocity_magnitude * math.cos(bounce_angle), velocity_magnitude * math.sin(bounce_angle))
-
-        #self.velocity = (bounce_velocity[0] * self.bounciness, bounce_velocity[1] * self.bounciness)
-        #self.game_object.pos = (self.game_object.pos[0] - penetration_sum[0], self.game_object.pos[1] - penetration_sum[1])  # correct object intersection
+        """Called when the collider collides with another collider"""
         if should_resolve:
             for collider in objects_colliding:
                 if isinstance(collider.game_object, Game.Body):
@@ -233,21 +224,16 @@ class DynamicCollider:
         for function in self.on_collision:
             function(self.game_object, objects_colliding)
 
-    def _get_kinetic_energy(self, velocity_vect):
-        return (self.mass * velocity_vect ** 2) / 2
-
-    # def _get_instant_collisions(self) -> list:
-    #     colliders_to_check = colliders_in_game.copy()
-    #     colliders_to_check.remove(self.collider)
-    #     return get_collider_colliding(self.collider, colliders_to_check)
-
     def get_collisions(self) -> list:
+        """Return the current colliding colliders of the dynamic collider"""
         return self.collisions
 
     def _set_collisions(self, collisions: list):
+        """Set the current colliding colliders of the dynamic collider"""
         self.collisions = collisions
 
     def get_penetration(self, colliders):
+        """Return the penetration of the collider with the colliders"""
         penetrations = get_penetration_with_all(self.collider, colliders)
         penetration_sum = (0, 0)
         for p in penetrations:
@@ -255,11 +241,13 @@ class DynamicCollider:
         return penetration_sum
 
     def _resolve_collision(self, collider):
+        """Resolve the collision with the collider"""
         solve_constraints(self, collider)
 
 
 
 def solve_constraints(collider1: Collider, collider2: Collider): # with energy conservation
+    """Solve the constraints between the two colliders"""
     dynamic_collider1 = get_dynamic_collider(collider1.game_object)
     dynamic_collider2 = get_dynamic_collider(collider2.game_object)
     if dynamic_collider1.static:
@@ -268,7 +256,6 @@ def solve_constraints(collider1: Collider, collider2: Collider): # with energy c
         else:
             solve_constraints(dynamic_collider2, dynamic_collider1)
     penetration = get_penetration(dynamic_collider1.collider, dynamic_collider2.collider)
-    collision_normal_angle = math.atan2(-penetration[1], -penetration[0])
 
     if not dynamic_collider2.static:
         velocity1 = dynamic_collider1.velocity
@@ -276,9 +263,6 @@ def solve_constraints(collider1: Collider, collider2: Collider): # with energy c
         projected_velocity1 = MathUtil.project_vector(velocity1, penetration)
         projected_velocity1 = (projected_velocity1[0], projected_velocity1[1])
         projected_velocity2 = MathUtil.project_vector(velocity2, penetration)
-        #print("projected : ", projected_velocity1, projected_velocity2)
-
-        average_bounciness = (dynamic_collider1.bounciness + dynamic_collider2.bounciness) / 2
 
         # https://www.vobarian.com/collisions/2dcollisions2.pdf
 
@@ -289,43 +273,31 @@ def solve_constraints(collider1: Collider, collider2: Collider): # with energy c
         final_velocity2y = (projected_velocity2[1] * (dynamic_collider2.mass - dynamic_collider1.mass) + projected_velocity1[1] * 2 * dynamic_collider1.mass) / (dynamic_collider1.mass + dynamic_collider2.mass)
         final_velocity2 = (final_velocity2x * dynamic_collider2.bounciness, final_velocity2y * dynamic_collider2.bounciness)
 
-        #print("final : ", final_velocity1, final_velocity2)
         dynamic_collider1.velocity = dynamic_collider1.velocity[0] + final_velocity1[0] - projected_velocity1[0], dynamic_collider1.velocity[1] + final_velocity1[1] - projected_velocity1[1]
         dynamic_collider2.velocity = dynamic_collider2.velocity[0] + final_velocity2[0] - projected_velocity2[0], dynamic_collider2.velocity[1] + final_velocity2[1] - projected_velocity2[1]
 
-        #print("initial pos : ", dynamic_collider1.game_object.pos, dynamic_collider2.game_object.pos)
-        #print("initial distance : ", MathUtil.magnitude(penetration))
         dynamic_collider1.game_object.pos = (dynamic_collider1.game_object.pos[0] - penetration[0] / 2, dynamic_collider1.game_object.pos[1] - penetration[1] / 2)
         dynamic_collider2.game_object.pos = (dynamic_collider2.game_object.pos[0] + penetration[0] / 2, dynamic_collider2.game_object.pos[1] + penetration[1] / 2)
-        #print("final pos : ", dynamic_collider1.game_object.pos, dynamic_collider2.game_object.pos)
-        #print("final distance : ", MathUtil.magnitude(get_penetration(dynamic_collider1.collider, dynamic_collider2.collider)))
-        #print("final distance after move : ", MathUtil.magnitude(get_penetration(dynamic_collider1.collider, dynamic_collider2.collider)))
 
     else:
-        velocity_angle = math.atan2(dynamic_collider1.velocity[1], dynamic_collider1.velocity[0])
-        velocity_magnitude = MathUtil.magnitude(dynamic_collider1.velocity)
-        angle_difference = velocity_angle - collision_normal_angle
-
-        bounce_angle = math.atan2(math.sin(angle_difference), -math.cos(angle_difference)) + collision_normal_angle
-        bounce_velocity = (velocity_magnitude * math.cos(bounce_angle), velocity_magnitude * math.sin(bounce_angle))
-
         projected_penetration_velocity = MathUtil.project_vector(dynamic_collider1.velocity, penetration)
         dynamic_collider1.velocity = (dynamic_collider1.velocity[0] + -projected_penetration_velocity[0] * (1 + dynamic_collider1.bounciness), dynamic_collider1.velocity[1] + -projected_penetration_velocity[1] * (1 + dynamic_collider1.bounciness))
 
-
-        # dynamic_collider1.velocity = (bounce_velocity[0] * dynamic_collider1.bounciness, bounce_velocity[1] * dynamic_collider1.bounciness)
         dynamic_collider1.game_object.pos = (dynamic_collider1.game_object.pos[0] - penetration[0], dynamic_collider1.game_object.pos[1] - penetration[1])
 
 
 def reset():
+    """Reset the physic system"""
     colliders_in_game.clear()
 
 def get_dynamic_collider(game_object):
+    """Return the dynamic collider of the game object"""
     if game_object.dynamic_collider is not None:
         return game_object.dynamic_collider
     return None
 
 def update(timeStep):
+    """Update the physic system"""
     #clear previous collisions
     collision_pairs.clear()
     for collider in colliders_in_game:

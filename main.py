@@ -6,37 +6,34 @@ import time
 running = True
 is_on_game = False
 frame = 0
-
+pressed = {}
 background = pygame.image.load("resources/background.jpg")
+play_button = pygame.image.load("resources/jouer.png")
+
+def is_mouse_on_rect(mouse_pos, rect):
+    """Return True if the mouse is on the rect"""
+    return rect.collidepoint(mouse_pos)
 
 if __name__ == "__main__":
     window = Graphic.Window("Test")
     start_program = time.time()
-    pressed = {}
-    play_button = pygame.image.load("resources/jouer.png")
-    Game.init_objects(window.get_size())
+
     background = pygame.transform.scale(background, window.get_size())
     while running:
         start = pygame.time.get_ticks()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            elif event.type == pygame.KEYDOWN:
-                pressed[event.key] = True
-                if is_on_game:
-                    Game.event_keydown(event.key)
-            elif event.type == pygame.KEYUP:
-                pressed[event.key] = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 coord = pygame.mouse.get_pos()
                 if 200 < coord[0] < 450 and 300 < coord[1] < 416 and not is_on_game:
                     is_on_game = True
-                    Game.reset(window.get_size())
-        # window.draw_text(str(Physics.get_circle_collider_penetration(body.get_collider(), thing.get_collider())), (0, 0), (255, 255, 255), 20)
+                    Game.reset()
+                    Game.init_game(window)
         window.draw_image(background, (0, 0))
         if is_on_game:
-            Game.update(pressed)
-            if Game.detect_end():
+            Game.update()
+            if Game.ended:
                 is_on_game = False
         else:
             window.screen.blit(play_button, (200, 300))
